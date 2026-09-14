@@ -33,12 +33,11 @@ export default function ConfirmDialog({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const titleId = useId();
-  const dialogRef = useRef<HTMLDivElement>(null);
+
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (open) {
-      setError("");
       // Move focus into the dialog so keyboard/screen-reader users land
       // somewhere sensible instead of the trigger they just activated.
       cancelButtonRef.current?.focus();
@@ -68,7 +67,19 @@ export default function ConfirmDialog({
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>{trigger}</span>
+      <span
+        onClick={() => {
+          // FIX: clear any error left over from a previous attempt here,
+          // at the point the dialog is opened, instead of in the effect
+          // above (setState directly in an effect body trips
+          // react-hooks/set-state-in-effect). Same visible behavior —
+          // this is the only place `open` ever transitions to true.
+          setError("");
+          setOpen(true);
+        }}
+      >
+        {trigger}
+      </span>
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
@@ -76,7 +87,6 @@ export default function ConfirmDialog({
           aria-modal="true"
           aria-labelledby={titleId}
           onKeyDown={handleKeyDown}
-          ref={dialogRef}
         >
           <div className="w-full max-w-sm border border-border bg-panel p-6">
             <h2 id={titleId} className="font-display text-lg text-text">
@@ -85,7 +95,10 @@ export default function ConfirmDialog({
             {description && <p className="mt-2 text-sm text-muted">{description}</p>}
             <p className="mt-2 text-sm text-red-400">This action cannot be undone.</p>
             {error && (
-              <p role="alert" className="mt-3 border border-red-500/30 bg-red-500/5 px-3 py-2 text-sm text-red-400">
+              <p
+                role="alert"
+                className="mt-3 border border-red-500/30 bg-red-500/5 px-3 py-2 text-sm text-red-400"
+              >
                 {error}
               </p>
             )}
