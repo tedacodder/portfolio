@@ -33,7 +33,7 @@ export default function ConfirmDialog({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const titleId = useId();
-  const dialogRef = useRef<HTMLDivElement>(null);
+
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -87,7 +87,6 @@ export default function ConfirmDialog({
           aria-modal="true"
           aria-labelledby={titleId}
           onKeyDown={handleKeyDown}
-          ref={dialogRef}
         >
           <div className="w-full max-w-sm border border-border bg-panel p-6">
             <h2 id={titleId} className="font-display text-lg text-text">
@@ -96,7 +95,10 @@ export default function ConfirmDialog({
             {description && <p className="mt-2 text-sm text-muted">{description}</p>}
             <p className="mt-2 text-sm text-red-400">This action cannot be undone.</p>
             {error && (
-              <p role="alert" className="mt-3 border border-red-500/30 bg-red-500/5 px-3 py-2 text-sm text-red-400">
+              <p
+                role="alert"
+                className="mt-3 border border-red-500/30 bg-red-500/5 px-3 py-2 text-sm text-red-400"
+              >
                 {error}
               </p>
             )}

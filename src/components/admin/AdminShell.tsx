@@ -52,18 +52,6 @@ export default function AdminShell({
   // (and harmless) on desktop.
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  // FIX: close the mobile nav automatically after navigating so it
-  // doesn't stay open covering the new page's content on the next visit.
-  // Adjusted during render (not in an effect) per React's guidance for
-  // resetting state when a prop changes — avoids the extra render+effect
-  // cycle and the "setState in effect" lint error, while still resetting
-  // exactly once per pathname change.
-  const [prevPathname, setPrevPathname] = useState(pathname);
-  if (pathname !== prevPathname) {
-    setPrevPathname(pathname);
-    setMobileNavOpen(false);
-  }
-
   function handleLogout() {
     startTransition(async () => {
       try {
@@ -104,6 +92,7 @@ export default function AdminShell({
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={() => setMobileNavOpen(false)}
                       aria-current={active ? "page" : undefined}
                       className={`block rounded-sm px-2.5 py-1.5 font-body text-sm transition-colors ${
                         active
@@ -159,7 +148,10 @@ export default function AdminShell({
           mobileNavOpen ? "block" : "hidden"
         } border-b border-border bg-panel px-5 py-6 lg:sticky lg:top-0 lg:block lg:h-dvh lg:overflow-y-auto lg:border-b-0 lg:border-r`}
       >
-        <Link href="/admin" className="hidden font-display text-lg tracking-tight text-text lg:block">
+        <Link
+          href="/admin"
+          className="hidden font-display text-lg tracking-tight text-text lg:block"
+        >
           engineering<span className="text-accent">.</span>console
         </Link>
         {navContent}
