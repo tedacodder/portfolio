@@ -22,9 +22,9 @@ interface ListResult<T> {
  * effect's dependency changed -> the effect re-fires -> another fetch ->
  * another render -> ... forever. That infinite loop was hammering every
  * admin list endpoint on every page load. `fetchPage` is now captured in a
- * ref that's kept current on every render (a plain assignment during
- * render, not a `useEffect`, so it never itself triggers a re-render or
- * needs to be an effect dependency), and the effect only re-runs when the
+ * ref that's kept current after every render (via a dependency-less
+ * effect, not a direct render-time assignment — refs must only be written
+ * in effects/event handlers), and the effect only re-runs when the
  * page or an explicit `reload()` actually changes.
  *
  * State setters are only ever called from inside promise callbacks, never
@@ -41,7 +41,14 @@ export function useAdminList<T>(fetchPage: (page: number) => Promise<ListResult<
   const [reloadToken, setReloadToken] = useState(0);
 
   const fetchPageRef = useRef(fetchPage);
-  fetchPageRef.current = fetchPage;
+  // FIX: writing to a ref directly in the render body trips
+  // react-hooks/refs ("Cannot access refs during render"). Keeping the
+  // assignment itself unchanged, just moved into a dependency-less effect
+  // (runs after every render, before the browser paints) — same "always
+  // current" guarantee, without touching the ref during render.
+  useEffect(() => {
+    fetchPageRef.current = fetchPage;
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -67,7 +74,6 @@ export function useAdminList<T>(fetchPage: (page: number) => Promise<ListResult<
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchPage is read from fetchPageRef precisely so it is not a dependency; see comment above.
   }, [page, reloadToken]);
 
   const reload = useCallback(() => {

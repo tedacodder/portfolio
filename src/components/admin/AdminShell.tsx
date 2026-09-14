@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { adminLogout } from "@/lib/api/admin";
 import { useToast } from "./Toast";
 import type { SessionUser } from "@/lib/auth/session";
@@ -54,9 +54,15 @@ export default function AdminShell({
 
   // FIX: close the mobile nav automatically after navigating so it
   // doesn't stay open covering the new page's content on the next visit.
-  useEffect(() => {
+  // Adjusted during render (not in an effect) per React's guidance for
+  // resetting state when a prop changes — avoids the extra render+effect
+  // cycle and the "setState in effect" lint error, while still resetting
+  // exactly once per pathname change.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setMobileNavOpen(false);
-  }, [pathname]);
+  }
 
   function handleLogout() {
     startTransition(async () => {

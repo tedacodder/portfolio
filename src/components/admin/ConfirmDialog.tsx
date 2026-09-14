@@ -38,7 +38,6 @@ export default function ConfirmDialog({
 
   useEffect(() => {
     if (open) {
-      setError("");
       // Move focus into the dialog so keyboard/screen-reader users land
       // somewhere sensible instead of the trigger they just activated.
       cancelButtonRef.current?.focus();
@@ -68,7 +67,19 @@ export default function ConfirmDialog({
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>{trigger}</span>
+      <span
+        onClick={() => {
+          // FIX: clear any error left over from a previous attempt here,
+          // at the point the dialog is opened, instead of in the effect
+          // above (setState directly in an effect body trips
+          // react-hooks/set-state-in-effect). Same visible behavior —
+          // this is the only place `open` ever transitions to true.
+          setError("");
+          setOpen(true);
+        }}
+      >
+        {trigger}
+      </span>
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
