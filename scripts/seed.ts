@@ -3,6 +3,7 @@ dotenv.config();
 
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import process from "node:process";
 import { hashPassword } from "../src/lib/auth/password";
 import * as schema from "../src/db/schema";
 
