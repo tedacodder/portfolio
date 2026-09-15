@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 
+export const revalidate = 60;
 // Chrome for the public-facing portfolio only (marketing pages, project
 // list, articles). Intentionally NOT shared with /admin: the admin console
 // has its own shell (sidebar + content grid) and must not be covered by the
