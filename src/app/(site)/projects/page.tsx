@@ -3,6 +3,7 @@ import { getProjects, getProfile } from "@/lib/data";
 import ProjectList from "@/components/projects/ProjectList";
 import Section, { SectionKicker, SectionHeading } from "@/components/ui/Section";
 
+export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
   const name = profile?.name ?? "Portfolio";
